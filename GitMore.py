@@ -70,6 +70,8 @@ def gitX(gitRepoPath=None):
         gitRepoPath.rstrip(os.path.sep).split(os.path.sep)[:-1])
     currentRepoPath = os.path.join(currentRepoDirPath, currentRepoName)
     newRepoPath = os.path.join(currentRepoDirPath, newRepoName)
+    if currentRepoPath == newRepoPath:
+        return None
     if not globalParameterDictionary["dry"]:
         datetimeStr = datetime.now().strftime("%Y%m%d%H%M%S%f")
         logContent = {
