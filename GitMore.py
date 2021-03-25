@@ -3,6 +3,7 @@ import click
 
 
 def richStyle(originString="", processedString=""):
+    global globalParameterDictionary
     import difflib
     richS1 = richS2 = ""
     richS1DifPos = richS2DifPos = 0
@@ -32,34 +33,45 @@ def richStyle(originString="", processedString=""):
 
 
 def getGitConfiguration(gitRepoPath=None):
+    import logging
+    logger = logging.getLogger("GitMore")
+    global globalParameterDictionary
     import os
     import re
     if (gitRepoPath is None) or (not os.path.exists(gitRepoPath)):
-        print(f"Not Valid Path:{gitRepoPath}\nPlease Check Again!")
+        logger.warning(f"Not Valid Path:{gitRepoPath}")
         return None
     if not os.path.isdir(os.path.join(gitRepoPath, ".git")):
-        print(f"Not Valid Git Repo Path:{gitRepoPath}\nPlease Check Again!")
+        logger.warning(f"Not Valid Git Repo Path:{gitRepoPath}")
         return None
     configPath = os.path.join(gitRepoPath, ".git/config")
     if not os.path.isfile(configPath):
-        print(f"No Valid Configuration:{gitRepoPath}\nPlease Check Again!")
+        logger.warning(f"No Valid Configuration:{gitRepoPath}")
         return None
     rePattern = ".*github.com/(.*)/(.*).git.*"
-    with open(configPath, "r") as fhandle:
-        for line in fhandle:
-            reMatch = re.match(rePattern, line)
-            if not reMatch is None:
-                return reMatch.groups()
+    try:
+        with open(configPath, "r") as fhandle:
+            for line in fhandle:
+                reMatch = re.match(rePattern, line)
+                if not reMatch is None:
+                    return reMatch.groups()
+        logger.debug(f"read git config successfully:{configPath}")
+    except:
+        e = sys.exc_info()
+        logger.error(e)
 
 
 def gitX(gitRepoPath=None):
+    import logging
+    logger = logging.getLogger("GitMore")
+    global globalParameterDictionary
     logDirPath = globalParameterDictionary["logDirPath"]
     console, style = globalParameterDictionary["console"]
     result = getGitConfiguration(gitRepoPath)
     newRepoName = None if result is None else str(result[1]) + "@" + str(
         result[0])
     if newRepoName is None:
-        print(f"No Valid Configuration found.")
+        logger.error(f"No Valid Configuration:{gitRepoPath}")
         return None
     from datetime import datetime
     import hashlib
@@ -70,6 +82,9 @@ def gitX(gitRepoPath=None):
         gitRepoPath.rstrip(os.path.sep).split(os.path.sep)[:-1])
     currentRepoPath = os.path.join(currentRepoDirPath, currentRepoName)
     newRepoPath = os.path.join(currentRepoDirPath, newRepoName)
+    if currentRepoPath == newRepoPath:
+        logger.debug(f"No Need GitMore:{currentRepoPath}")
+        return None
     if not globalParameterDictionary["dry"]:
         datetimeStr = datetime.now().strftime("%Y%m%d%H%M%S%f")
         logContent = {
@@ -82,9 +97,21 @@ def gitX(gitRepoPath=None):
             logDirPath,
             hashlib.md5(newRepoPath.encode("UTF-8")).hexdigest() + "_" +
             datetimeStr + ".pkl")
-        with open(logPath, "wb") as fhandle:
-            pickle.dump(logContent, fhandle)
-        os.rename(currentRepoPath, newRepoPath)
+        try:
+            with open(logPath, "wb") as fhandle:
+                pickle.dump(logContent, fhandle)
+            logger.debug(f"write {logPath} successfully.")
+        except:
+            e = sys.exc_info()
+            logger.error(e)
+        try:
+            os.rename(currentRepoPath, newRepoPath)
+            logger.debug(
+                f"rename {currentRepoName} to {newRepoName} successfully.")
+        except:
+            e = sys.exc_info()
+            logger.error(e)
+
     richCurrentRepoPath, richNewRepoPath = richStyle(currentRepoPath,
                                                      newRepoPath)
     console.print(" " * 3 + richCurrentRepoPath, style=style)
@@ -117,21 +144,45 @@ def gitMore(argpath, dry):
 
 
 if __name__ == "__main__":
+    from datetime import datetime
+    import logging
     import os
     import sys
     from rich.console import Console
     from rich.theme import Theme
+    #Define some varible
     console = Console(width=240, theme=Theme(inherit=False))
     style = "black on white"
-    if (sys.version_info.major, sys.version_info.minor) < (3, 8):
-        console.print(
-            f"current Version is {sys.version},\n Please upgrade to at least 3.8."
-        )
-        sys.exit()
+    datetimeStr = datetime.now().strftime("%Y%m%d%H%M%S%f")
     scriptDirPath = os.path.dirname(os.path.realpath(__file__))
-
     globalParameterDictionary = {}
     globalParameterDictionary["logDirPath"] = os.path.join(
         scriptDirPath, "data")
     globalParameterDictionary["console"] = (console, style)
+    #Create Logger
+    logger = logging.getLogger("GitMore")
+    logger.setLevel(logging.DEBUG)
+    #Create File Handler
+    #Mode set Write
+    fhandle = logging.FileHandler(os.path.join(
+        scriptDirPath, "./log", "GitMorelog_" + datetimeStr + ".log"),
+                                  mode="w")
+    fhandle.setLevel(logging.DEBUG)
+    #Create Console Handler
+    chandle = logging.StreamHandler()
+    chandle.setLevel(logging.ERROR)
+    #Create Formatter
+    formatter = logging.Formatter(
+        "%(asctime)s-%(name)s-%(levelname)s-%(message)s")
+    fhandle.setFormatter(formatter)
+    chandle.setFormatter(formatter)
+    #Add Handlers to the Logger
+    logger.addHandler(fhandle)
+    logger.addHandler(chandle)
+    #Check Python Version if < 3.8 exit
+    if (sys.version_info.major, sys.version_info.minor) < (3, 8):
+        logger.error(
+            f"current is {sys.version},Please upgrade to python 3.8 and more.")
+        sys.exit()
+    #gitMore action ...
     gitMore()
