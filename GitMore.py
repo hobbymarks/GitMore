@@ -112,7 +112,7 @@ def gitMore(argpath, dry):
     for root, subdir, files in os.walk(globalParameterDictionary["argpath"]):
         for f in files:
             if ".git" in subdir:
-                gitX(root)
+                gitX(os.path.abspath(root))
                 break
 
 
