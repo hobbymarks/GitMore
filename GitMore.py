@@ -63,9 +63,11 @@ def getGitConfiguration(gitRepoPath=None):
 
 def gitX(gitRepoPath=None):
     import logging
+    import pathlib
     logger = logging.getLogger("GitMore")
     global globalParameterDictionary
-    logDirPath = globalParameterDictionary["logDirPath"]
+    dataDirPath = globalParameterDictionary["dataDirPath"]
+    pathlib.Path(dataDirPath).mkdir(parents=True, exist_ok=True)
     console, style = globalParameterDictionary["console"]
     result = getGitConfiguration(gitRepoPath)
     newRepoName = None if result is None else str(result[1]) + "@" + str(
@@ -94,7 +96,7 @@ def gitX(gitRepoPath=None):
             }
         }
         logPath = os.path.join(
-            logDirPath,
+            dataDirPath,
             hashlib.md5(newRepoPath.encode("UTF-8")).hexdigest() + "_" +
             datetimeStr + ".pkl")
         try:
@@ -147,6 +149,7 @@ if __name__ == "__main__":
     from datetime import datetime
     import logging
     import os
+    import pathlib
     import sys
     from rich.console import Console
     from rich.theme import Theme
@@ -156,7 +159,7 @@ if __name__ == "__main__":
     datetimeStr = datetime.now().strftime("%Y%m%d%H%M%S%f")
     scriptDirPath = os.path.dirname(os.path.realpath(__file__))
     globalParameterDictionary = {}
-    globalParameterDictionary["logDirPath"] = os.path.join(
+    globalParameterDictionary["dataDirPath"] = os.path.join(
         scriptDirPath, "data")
     globalParameterDictionary["console"] = (console, style)
     #Create Logger
@@ -164,8 +167,10 @@ if __name__ == "__main__":
     logger.setLevel(logging.DEBUG)
     #Create File Handler
     #Mode set Write
+    logDirPath = os.path.join(scriptDirPath, "./log")
+    pathlib.Path(logDirPath).mkdir(parents=True, exist_ok=True)
     fhandle = logging.FileHandler(os.path.join(
-        scriptDirPath, "./log", "GitMorelog_" + datetimeStr + ".log"),
+        logDirPath, "GitMorelog_" + datetimeStr + ".log"),
                                   mode="w")
     fhandle.setLevel(logging.DEBUG)
     #Create Console Handler
