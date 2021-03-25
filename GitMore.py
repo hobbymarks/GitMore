@@ -3,7 +3,7 @@ import click
 
 
 def richStyle(originString="", processedString=""):
-    global globalParameterDictionary
+    global globalParamDict
     import difflib
     richS1 = richS2 = ""
     richS1DifPos = richS2DifPos = 0
@@ -35,7 +35,7 @@ def richStyle(originString="", processedString=""):
 def getGitConfiguration(gitRepoPath=None):
     import logging
     logger = logging.getLogger("GitMore")
-    global globalParameterDictionary
+    global globalParamDict
     import os
     import re
     if (gitRepoPath is None) or (not os.path.exists(gitRepoPath)):
@@ -65,10 +65,10 @@ def gitX(gitRepoPath=None):
     import logging
     import pathlib
     logger = logging.getLogger("GitMore")
-    global globalParameterDictionary
-    dataDirPath = globalParameterDictionary["dataDirPath"]
+    global globalParamDict
+    dataDirPath = globalParamDict["dataDirPath"]
     pathlib.Path(dataDirPath).mkdir(parents=True, exist_ok=True)
-    console, style = globalParameterDictionary["console"]
+    console, style = globalParamDict["console"]
     result = getGitConfiguration(gitRepoPath)
     newRepoName = None if result is None else str(result[1]) + "@" + str(
         result[0])
@@ -87,7 +87,7 @@ def gitX(gitRepoPath=None):
     if currentRepoPath == newRepoPath:
         logger.debug(f"No Need GitMore:{currentRepoPath}")
         return None
-    if not globalParameterDictionary["dry"]:
+    if not globalParamDict["dry"]:
         datetimeStr = datetime.now().strftime("%Y%m%d%H%M%S%f")
         logContent = {
             "current": newRepoPath,
@@ -95,14 +95,14 @@ def gitX(gitRepoPath=None):
                 datetimeStr: currentRepoPath
             }
         }
-        logPath = os.path.join(
+        dataPath = os.path.join(
             dataDirPath,
             hashlib.md5(newRepoPath.encode("UTF-8")).hexdigest() + "_" +
             datetimeStr + ".pkl")
         try:
-            with open(logPath, "wb") as fhandle:
+            with open(dataPath, "wb") as fhandle:
                 pickle.dump(logContent, fhandle)
-            logger.debug(f"write {logPath} successfully.")
+            logger.debug(f"write {dataPath} successfully.")
         except:
             e = sys.exc_info()
             logger.error(e)
@@ -110,6 +110,17 @@ def gitX(gitRepoPath=None):
             os.rename(currentRepoPath, newRepoPath)
             logger.debug(
                 f"rename {currentRepoName} to {newRepoName} successfully.")
+            if globalParamDict["appDirPath"] != os.path.dirname(
+                    os.path.realpath(__file__)):
+                globalParamDict["appDirPath"] = os.path.dirname(
+                    os.path.realpath(__file__))
+                logger.debug(
+                    f'Current appDirPath:{globalParamDict["appDirPath"]}')
+                globalParamDict["dataDirPath"] = os.path.join(
+                    globalParamDict["appDirPath"], "data")
+                logger.debug(
+                    f'Current dataDirPath:{globalParamDict["dataDirPath"]}')
+
         except:
             e = sys.exc_info()
             logger.error(e)
@@ -128,17 +139,17 @@ def gitX(gitRepoPath=None):
               help="If dry is True will not change file name.",
               show_default=True)
 def gitMore(argpath, dry):
-    global globalParameterDictionary
-    """Change Git Local Repo Dir Name to RepoName@OrgName
+    global globalParamDict
+    """Change Git Local Repo Dir Name to RepoName@OrgName format
     """
     if argpath:
-        globalParameterDictionary["argpath"] = argpath
+        globalParamDict["argpath"] = argpath
     else:
-        globalParameterDictionary["argpath"] = "."
-    globalParameterDictionary["dry"] = dry
+        globalParamDict["argpath"] = "."
+    globalParamDict["dry"] = dry
 
     import os
-    for root, subdir, files in os.walk(globalParameterDictionary["argpath"]):
+    for root, subdir, files in os.walk(globalParamDict["argpath"]):
         for f in files:
             if ".git" in subdir:
                 gitX(os.path.abspath(root))
@@ -157,17 +168,18 @@ if __name__ == "__main__":
     console = Console(width=240, theme=Theme(inherit=False))
     style = "black on white"
     datetimeStr = datetime.now().strftime("%Y%m%d%H%M%S%f")
-    scriptDirPath = os.path.dirname(os.path.realpath(__file__))
-    globalParameterDictionary = {}
-    globalParameterDictionary["dataDirPath"] = os.path.join(
-        scriptDirPath, "data")
-    globalParameterDictionary["console"] = (console, style)
+    appDirPath = os.path.dirname(os.path.realpath(__file__))
+    globalParamDict = {}
+    globalParamDict["appDirPath"] = appDirPath
+    globalParamDict["dataDirPath"] = os.path.join(globalParamDict["appDirPath"],
+                                                  "data")
+    globalParamDict["console"] = (console, style)
     #Create Logger
     logger = logging.getLogger("GitMore")
     logger.setLevel(logging.DEBUG)
     #Create File Handler
     #Mode set Write
-    logDirPath = os.path.join(scriptDirPath, "./log")
+    logDirPath = os.path.join(appDirPath, "./log")
     pathlib.Path(logDirPath).mkdir(parents=True, exist_ok=True)
     fhandle = logging.FileHandler(os.path.join(
         logDirPath, "GitMorelog_" + datetimeStr + ".log"),
