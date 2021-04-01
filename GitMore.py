@@ -128,7 +128,10 @@ def gitX(gitRepoPath=None):
     richCurrentRepoPath, richNewRepoPath = richStyle(currentRepoPath,
                                                      newRepoPath)
     console.print(" " * 3 + richCurrentRepoPath, style=style)
-    console.print("==>" + richNewRepoPath, style=style)
+    if globalParamDict["dry"]:
+        console.print("-->" + richNewRepoPath, style=style)
+    else:
+        console.print("==>" + richNewRepoPath, style=style)
 
 
 @click.command(context_settings={"ignore_unknown_options": True})
@@ -154,6 +157,10 @@ def gitMore(argpath, dry):
             if ".git" in subdir:
                 gitX(os.path.abspath(root))
                 break
+    if globalParamDict["dry"]:
+        console.print("*" * 80)
+        console.print(
+            "In order to take effect,run the CLI add option '--dry False'")
 
 
 if __name__ == "__main__":
