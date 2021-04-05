@@ -48,13 +48,14 @@ def getGitConfiguration(gitRepoPath=None):
     if not os.path.isfile(configPath):
         logger.warning(f"No Valid Configuration:{gitRepoPath}")
         return None
-    rePattern = ".*github.com/(.*)/(.*).git.*"
+    rePatternList = [".*github.com/(.*)/(.*).git.*", ".*github.com/(.*)/(.*)"]
     try:
         with open(configPath, "r") as fhandle:
             for line in fhandle:
-                reMatch = re.match(rePattern, line)
-                if not reMatch is None:
-                    return reMatch.groups()
+                for rePattern in rePatternList:
+                    reMatch = re.match(rePattern, line)
+                    if not reMatch is None:
+                        return reMatch.groups()
         logger.debug(f"read git config successfully:{configPath}")
     except:
         e = sys.exc_info()
