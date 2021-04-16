@@ -1,5 +1,5 @@
 # giat
-Change Git Repo Dir name to Repo@Org format.
+Change Local Git Repo Dir name to Repo@Org format.
 
 ---
 # giat
