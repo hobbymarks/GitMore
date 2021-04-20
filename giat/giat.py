@@ -2,166 +2,195 @@
 import click
 
 
-def richStyle(originString="", processedString=""):
-    global globalParamDict
+# TODO: split rich style to standalone
+def rich_style(org_str="", pro_str=""):
+    """
+    Compare original string and processed string ,
+    return difference with rich style
+    delete decorated by bold red
+    add decorated by bold green
+    space decorated by square box
+    :param org_str: short for original string
+    :param pro_str: short for processed string
+    :return: riched original string and riched processed string
+    *riched means decorated by rich package
+    """
+    global gParamDict
     import difflib
-    richS1 = richS2 = ""
-    richS1DifPos = richS2DifPos = 0
-    for match in difflib.SequenceMatcher(0, originString,
-                                         processedString).get_matching_blocks():
-        if richS1DifPos < match.a:
-            richS1 += "[bold red]" + originString[richS1DifPos:match.a].replace(
-                " ", "▯") + "[/bold red]" + originString[match.a:match.a +
-                                                         match.size]
-            richS1DifPos = match.a + match.size
+    rich_org_str = rich_pro_str = ""
+    rich_org_dif_pos = rich_pro_dif_pos = 0
+    for match in difflib.SequenceMatcher(None, org_str,
+                                         pro_str).get_matching_blocks():
+        if rich_org_dif_pos < match.a:
+            rich_org_str += "[bold red]" + org_str[
+                rich_org_dif_pos:match.a].replace(
+                    " ", "▯") + "[/bold red]" + org_str[match.a:match.a +
+                                                        match.size]
+            rich_org_dif_pos = match.a + match.size
         else:
-            richS1 += originString[match.a:match.a + match.size]
-            richS1DifPos = match.a + match.size
+            rich_org_str += org_str[match.a:match.a + match.size]
+            rich_org_dif_pos = match.a + match.size
 
-        if richS2DifPos < match.b:
-            richS2 += "[bold green]" + processedString[
-                richS2DifPos:match.b].replace(
-                    " ",
-                    "▯") + "[/bold green]" + processedString[match.b:match.b +
-                                                             match.size]
-            richS2DifPos = match.b + match.size
+        if rich_pro_dif_pos < match.b:
+            rich_pro_str += "[bold green]" + pro_str[
+                rich_pro_dif_pos:match.b].replace(
+                    " ", "▯") + "[/bold green]" + pro_str[match.b:match.b +
+                                                          match.size]
+            rich_pro_dif_pos = match.b + match.size
         else:
-            richS2 += processedString[match.b:match.b + match.size]
-            richS2DifPos = match.b + match.size
+            rich_pro_str += pro_str[match.b:match.b + match.size]
+            rich_pro_dif_pos = match.b + match.size
 
-    return richS1, richS2
+    return rich_org_str, rich_pro_str
 
 
-def getGitConfiguration(gitRepoPath=None):
+def get_git_config(git_repo_path=None):
+    """
+    retrieve git configuration by from given local git repo path
+    :param git_repo_path: git repo path
+    :return: git repo name  and org name
+    """
     import logging
-    logger = logging.getLogger("GitMore")
-    global globalParamDict
+    logger = logging.getLogger("giat")
+    # TODO: decorate logger by rich
+    global gParamDict
     import os
     import re
-    if (gitRepoPath is None) or (not os.path.exists(gitRepoPath)):
-        logger.warning(f"Not Valid Path:{gitRepoPath}")
+    if git_repo_path is None:
+        logger.warning(f"git repo path is None:{git_repo_path}")
         return None
-    if not os.path.isdir(os.path.join(gitRepoPath, ".git")):
-        logger.warning(f"Not Valid Git Repo Path:{gitRepoPath}")
+    if not os.path.exists(git_repo_path):
+        logger.warning(f"git repo path not exist:{git_repo_path}")
         return None
-    configPath = os.path.join(gitRepoPath, ".git/config")
-    if not os.path.isfile(configPath):
-        logger.warning(f"No Valid Configuration:{gitRepoPath}")
+    if not os.path.isdir(os.path.join(git_repo_path, ".git")):
+        logger.warning(f"No valid directory found:{git_repo_path}")
         return None
-    rePatternList = [".*github.com/(.*)/(.*).git.*", ".*github.com/(.*)/(.*)"]
+    config_path = os.path.join(git_repo_path, ".git/config")
+    if not os.path.isfile(config_path):
+        logger.warning(f"No valid configuration file found:{git_repo_path}")
+        return None
+    re_pattern_list = [
+        ".*github.com/(.*)/(.*).git.*", ".*github.com/(.*)/(.*)"
+    ]
     try:
-        with open(configPath, "r") as fhandle:
-            for line in fhandle:
-                for rePattern in rePatternList:
-                    reMatch = re.match(rePattern, line)
-                    if not reMatch is None:
-                        return reMatch.groups()
-        logger.debug(f"read git config successfully:{configPath}")
-    except:
-        e = sys.exc_info()
-        logger.error(e)
+        with open(config_path, "r") as fh:
+            for line in fh:
+                for rep in re_pattern_list:
+                    re_match = re.match(rep, line)
+                    if re_match is not None:
+                        logger.debug(
+                            f"read git config successfully:{config_path}")
+                        return re_match.groups()
+            logger.warning(f"No matched configuration found:{config_path}")
+            return None  # run to here ,means no matched configuration found
+    except FileNotFoundError:
+        logger.error(f"read file failed:{config_path}")
+
+    return None  #run to here,means exception ...
 
 
-def gitX(gitRepoPath=None):
+def gitx(git_repo_path=None):
+    """
+    Change local git repo dir name to git@org style
+    :param git_repo_path: local git repo path
+    :return:
+    """
     import logging
-    import pathlib
-    logger = logging.getLogger("GitMore")
-    global globalParamDict
-    dataDirPath = globalParamDict["dataDirPath"]
-    pathlib.Path(dataDirPath).mkdir(parents=True, exist_ok=True)
-    console, style = globalParamDict["console"]
-    result = getGitConfiguration(gitRepoPath)
-    newRepoName = None if result is None else str(result[1]) + "@" + str(
-        result[0])
-    if newRepoName is None:
-        logger.error(f"No Valid Configuration:{gitRepoPath}")
-        return None
-    from datetime import datetime
-    import hashlib
-    import os
-    import pickle
-    currentRepoName = gitRepoPath.rstrip(os.path.sep).split(os.path.sep)[-1]
-    currentRepoDirPath = (os.path.sep).join(
-        gitRepoPath.rstrip(os.path.sep).split(os.path.sep)[:-1])
-    currentRepoPath = os.path.join(currentRepoDirPath, currentRepoName)
-    newRepoPath = os.path.join(currentRepoDirPath, newRepoName)
-    if currentRepoPath == newRepoPath:
-        logger.debug(f"No Need GitMore:{currentRepoPath}")
-        return None
-    if not globalParamDict["dry"]:
-        datetimeStr = datetime.now().strftime("%Y%m%d%H%M%S%f")
-        logContent = {
-            "current": newRepoPath,
-            "history": {
-                datetimeStr: currentRepoPath
-            }
-        }
-        dataPath = os.path.join(
-            dataDirPath,
-            hashlib.md5(newRepoPath.encode("UTF-8")).hexdigest() + "_" +
-            datetimeStr + ".pkl")
-        try:
-            with open(dataPath, "wb") as fhandle:
-                pickle.dump(logContent, fhandle)
-            logger.debug(f"write {dataPath} successfully.")
-        except:
-            e = sys.exc_info()
-            logger.error(e)
-        try:
-            os.rename(currentRepoPath, newRepoPath)
-            logger.debug(
-                f"rename {currentRepoName} to {newRepoName} successfully.")
-            if globalParamDict["appDirPath"] != os.path.dirname(
-                    os.path.realpath(__file__)):
-                globalParamDict["appDirPath"] = os.path.dirname(
-                    os.path.realpath(__file__))
-                logger.debug(
-                    f'Current appDirPath:{globalParamDict["appDirPath"]}')
-                globalParamDict["dataDirPath"] = os.path.join(
-                    globalParamDict["appDirPath"], "data")
-                logger.debug(
-                    f'Current dataDirPath:{globalParamDict["dataDirPath"]}')
+    logger = logging.getLogger("giat")
+    global gParamDict
 
-        except:
-            e = sys.exc_info()
-            logger.error(e)
-
-    richCurrentRepoPath, richNewRepoPath = richStyle(currentRepoPath,
-                                                     newRepoPath)
-    console.print(" " * 3 + richCurrentRepoPath, style=style)
-    if globalParamDict["dry"]:
-        console.print("-->" + richNewRepoPath, style=style)
+    console, style = gParamDict["console"]
+    if git_repo_path is not None:
+        result = get_git_config(git_repo_path)
     else:
-        console.print("==>" + richNewRepoPath, style=style)
+        logger.warning(f"git repo path is None:{git_repo_path}")
+        return None
+    new_repo_name = None if result is None else str(result[1]) + "@" + str(
+        result[0])
+    if new_repo_name is None:
+        logger.warning(f"Not got valid configuration:{git_repo_path}")
+        return None
+    import os
+    current_repo_name = git_repo_path.rstrip(os.path.sep).split(
+        os.path.sep)[-1]
+    current_repo_dir_path = os.path.sep.join(
+        git_repo_path.rstrip(os.path.sep).split(os.path.sep)[:-1])
+    current_repo_path = os.path.join(current_repo_dir_path, current_repo_name)
+    new_repo_path = os.path.join(current_repo_dir_path, new_repo_name)
+    if current_repo_path == new_repo_path:
+        logger.debug(f"No Need giat:{current_repo_path}")
+        return None
+    if not gParamDict["dry_run"]:
+        try:
+            os.rename(current_repo_path, new_repo_path)
+            logger.debug(
+                f"rename {current_repo_name} to {new_repo_name} successfully.")
+        except IOError:
+            logger.warning(
+                f"rename {current_repo_name} to {new_repo_name} failed.")
+        else:
+            e = sys.exc_info()
+            logger.warning(e)
+
+    rich_current_repo_path, rich_new_repo_path = rich_style(
+        current_repo_path, new_repo_path)
+    console.print(" " * 3 + rich_current_repo_path, style=style)
+    if gParamDict["dry_run"]:
+        console.print("-->" + rich_new_repo_path, style=style)
+    else:
+        console.print("==>" + rich_new_repo_path, style=style)
 
 
+# TODO:add only display mode such as diplay all local git repo
 @click.command(context_settings={"ignore_unknown_options": True})
-@click.argument("argpath", required=False, type=click.Path(exists=True))
-@click.option("--dry",
+@click.option("-v", "--verbose", count=True, help="Enables verbose mode.")
+@click.argument("dir_path", required=False, type=click.Path(exists=True))
+@click.option("-d",
+              "--dry_run",
               default=True,
               type=bool,
-              help="If dry is True will not change file name.",
+              help="If dry_run is True will not change file name.",
               show_default=True)
-def gitMore(argpath, dry):
-    global globalParamDict
-    """Change Git Local Repo Dir Name to RepoName@OrgName format
+def giat(verbose, dir_path, dry_run):
     """
-    if argpath:
-        globalParamDict["argpath"] = argpath
+    traverse all directory and sub directory then
+    change git local repo directory name to RepoName@OrgName format
+    :param dir_path:
+    :param dry_run:
+    :return:
+
+    """
+    import logging
+    logger = logging.getLogger("giat")
+    global gParamDict
+    if dir_path:
+        gParamDict["dir_path"] = dir_path
     else:
-        globalParamDict["argpath"] = "."
-    globalParamDict["dry"] = dry
+        gParamDict["dir_path"] = "."
+    gParamDict["dry_run"] = dry_run
+    if verbose == 1:
+        gParamDict["verbose"] = 1
+        logger.handlers[1].setLevel(logging.ERROR)
+    elif verbose == 2:
+        gParamDict["verbose"] = 2
+        logger.handlers[1].setLevel(logging.WARNING)
+    elif verbose == 3:
+        gParamDict["verbose"] = 3
+        logger.handlers[1].setLevel(logging.DEBUG)
+    else:
+        gParamDict["verbose"] = 0
 
     import os
-    for root, subdir, files in os.walk(globalParamDict["argpath"]):
-        for f in files:
+    for root, subdir, files in os.walk(gParamDict["dir_path"]):
+        for _ in files:
             if ".git" in subdir:
-                gitX(os.path.abspath(root))
+                gitx(os.path.abspath(root))
                 break
-    if globalParamDict["dry"]:
+    # Print some tips at last
+    if gParamDict["dry_run"]:
         console.print("*" * 80)
         console.print(
-            "In order to take effect,run the CLI add option '--dry False'")
+            "In order to take effect,run the CLI add option '--dry_run False'")
 
 
 if __name__ == "__main__":
@@ -172,42 +201,40 @@ if __name__ == "__main__":
     import sys
     from rich.console import Console
     from rich.theme import Theme
-    #Define some varible
+
+    # Define some variable
     console = Console(width=240, theme=Theme(inherit=False))
     style = "black on white"
     datetimeStr = datetime.now().strftime("%Y%m%d%H%M%S%f")
     appDirPath = os.path.dirname(os.path.realpath(__file__))
-    globalParamDict = {}
-    globalParamDict["appDirPath"] = appDirPath
-    globalParamDict["dataDirPath"] = os.path.join(globalParamDict["appDirPath"],
-                                                  "data")
-    globalParamDict["console"] = (console, style)
-    #Create Logger
-    logger = logging.getLogger("GitMore")
+    gParamDict = {"appDirPath": appDirPath, "console": (console, style)}
+    # Create Logger
+    logger = logging.getLogger("giat")
     logger.setLevel(logging.DEBUG)
-    #Create File Handler
-    #Mode set Write
+    # Create File Handler
+    # Mode set Write
     logDirPath = os.path.join(appDirPath, "./log")
     pathlib.Path(logDirPath).mkdir(parents=True, exist_ok=True)
-    fhandle = logging.FileHandler(os.path.join(
-        logDirPath, "GitMorelog_" + datetimeStr + ".log"),
-                                  mode="w")
-    fhandle.setLevel(logging.DEBUG)
-    #Create Console Handler
-    chandle = logging.StreamHandler()
-    chandle.setLevel(logging.ERROR)
-    #Create Formatter
+    fh = logging.FileHandler(os.path.join(logDirPath,
+                                          "giatlog_" + datetimeStr + ".log"),
+                             mode="w")
+    fh.setLevel(logging.DEBUG)
+    # Create Console Handler
+    # TODO: split logger to standalone
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.FATAL)  # default set FATAL
+    # Create logging Formatter
     formatter = logging.Formatter(
         "%(asctime)s-%(name)s-%(levelname)s-%(message)s")
-    fhandle.setFormatter(formatter)
-    chandle.setFormatter(formatter)
-    #Add Handlers to the Logger
-    logger.addHandler(fhandle)
-    logger.addHandler(chandle)
-    #Check Python Version if < 3.8 exit
+    fh.setFormatter(formatter)
+    ch.setFormatter(formatter)
+    # Add Handlers to the Logger
+    logger.addHandler(fh)
+    logger.addHandler(ch)
+    # Check Python Version if < 3.8 exit
     if (sys.version_info.major, sys.version_info.minor) < (3, 8):
         logger.error(
             f"current is {sys.version},Please upgrade to python 3.8 and more.")
         sys.exit()
-    #gitMore action ...
-    gitMore()
+    # giat action ...
+    giat()
