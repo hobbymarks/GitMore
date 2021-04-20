@@ -1,4 +1,9 @@
-.ipynb_checkpoints/
 build/
 dist/
-
+giat/log/
+giat/.ipynb_checkpoints/
+giat/__pycache__/
+tests/__pycache__/
+.pytest_cache/
+htmlcov/
+.coverage
