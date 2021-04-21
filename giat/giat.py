@@ -99,7 +99,6 @@ def gitx(git_repo_path=None):
     logger = logging.getLogger("giat")
     global gParamDict
 
-    console, style = gParamDict["console"]
     if git_repo_path is not None:
         result = get_git_config(git_repo_path)
     else:
@@ -111,10 +110,10 @@ def gitx(git_repo_path=None):
         logger.warning(f"Not got valid configuration:{git_repo_path}")
         return None
     import os
-    current_repo_name = git_repo_path.rstrip(os.path.sep).split(
+    current_repo_name = str(git_repo_path).rstrip(os.path.sep).split(
         os.path.sep)[-1]
     current_repo_dir_path = os.path.sep.join(
-        git_repo_path.rstrip(os.path.sep).split(os.path.sep)[:-1])
+        str(git_repo_path).rstrip(os.path.sep).split(os.path.sep)[:-1])
     current_repo_path = os.path.join(current_repo_dir_path, current_repo_name)
     new_repo_path = os.path.join(current_repo_dir_path, new_repo_name)
     if current_repo_path == new_repo_path:
@@ -132,6 +131,7 @@ def gitx(git_repo_path=None):
             e = sys.exc_info()
             logger.warning(e)
 
+    console, style = gParamDict["console"]
     rich_current_repo_path, rich_new_repo_path = rich_style(
         current_repo_path, new_repo_path)
     console.print(" " * 3 + rich_current_repo_path, style=style)
