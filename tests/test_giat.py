@@ -3,7 +3,7 @@ import random
 import shutil
 import string
 import uuid
-from giat import giat
+from giat import giatcli
 import pytest
 
 
@@ -13,71 +13,44 @@ def temporary_path(tmp_path):
     shutil.rmtree(tmp_path)
 
 
-nonexist_path = str(uuid.uuid1()).replace("-", "")
-nonexit_gitpath_data = [(None, None), (nonexist_path, None)]
+non_exist_path = str(uuid.uuid1()).replace("-", "")
+non_exist_git_path_data = [(None, None), (non_exist_path, None)]
 
 
 def test_rich_style():
-    orgs = pros = "".join(
+    org_str = pro_str = "".join(
         random.choice(string.ascii_letters + string.digits +
                       string.punctuation) for _ in range(64))
-    rich_orgs, rich_pros = giat.rich_style(orgs, pros)
-    assert (rich_orgs == orgs) and (rich_pros == pros)
+    rich_org_str, rich_pro_str = giatcli.rich_style(org_str, pro_str)
+    assert (rich_org_str == org_str) and (rich_pro_str == pro_str)
 
 
-@pytest.mark.parametrize("gitpath,result", nonexit_gitpath_data)
-def test_get_git_config_nonexist_path(gitpath, result):
-    assert giat.get_git_config(gitpath) == result
-#
-#
-# def test_get_git_config_nongit_path(temporary_path):
-#     assert giat.get_git_config(temporary_path) is None
-
-#
-# def test_get_git_config_nonvalid_gitpath(temporary_path):
-#     os.mkdir(os.path.join(temporary_path, ".git"))
-#     assert giat.get_git_config(temporary_path) is None
-#
-#
-# def test_get_git_config_nonvalid_config(temporary_path):
-#     os.makedirs(os.path.join(temporary_path, ".git/"))
-#     with open(os.path.join(os.path.join(temporary_path, ".git/"), "config"),
-#               "w") as fh:
-#         fh.write("test...firstLine")
-#         fh.write("test...secondLine")
-#     assert giat.get_git_config(temporary_path) is None
-#
-#
-# def test_get_git_config_valid_config(temporary_path):
-#     os.makedirs(os.path.join(temporary_path, ".git/"))
-#     with open(os.path.join(os.path.join(temporary_path, ".git/"), "config"),
-#               "w") as fh:
-#         fh.write("github.com/Org/Repo\n")
-#         fh.write("test...secondLine")
-#     assert giat.get_git_config(temporary_path) == ("Org", "Repo")
+@pytest.mark.parametrize("git_path ,result", non_exist_git_path_data)
+def test_get_git_config_non_exist_path(git_path, result):
+    assert giatcli.get_git_config(git_path) == result
 
 
 ###############################################################################
 def test_gitx_none_path():
-    assert giat.gitx(None) is None
+    assert giatcli.gitx(None) is None
 
 
-def test_gitx_nongit_path(temporary_path):
-    assert giat.gitx(temporary_path) is None
+def test_gitx_not_git_path(temporary_path):
+    assert giatcli.gitx(temporary_path) is None
 
 
-def test_gitx_config_nonvalid_gitpath(temporary_path):
+def test_gitx_config_invalid_git_path(temporary_path):
     os.mkdir(os.path.join(temporary_path, ".git"))
-    assert giat.gitx(temporary_path) is None
+    assert giatcli.gitx(temporary_path) is None
 
 
-def test_gitx_nonvalid_config(temporary_path):
+def test_gitx_invalid_config(temporary_path):
     os.makedirs(os.path.join(temporary_path, ".git/"))
     with open(os.path.join(os.path.join(temporary_path, ".git/"), "config"),
               "w") as fh:
         fh.write("test...firstLine")
         fh.write("test...secondLine")
-    assert giat.gitx(temporary_path) is None
+    assert giatcli.gitx(temporary_path) is None
 
 
 def test_gitx_valid_config(temporary_path):
@@ -86,9 +59,11 @@ def test_gitx_valid_config(temporary_path):
               "w") as fh:
         fh.write("github.com/Org/Repo\n")
         fh.write("test...secondLine")
-    assert giat.gitx(temporary_path) is None
+    assert giatcli.gitx(temporary_path) is None
+
 
 ###############################################################################
 
+
 def test_giat():
-    assert giat.giat("","./",None) is None
+    assert giatcli.giat("", "./", None) is None
