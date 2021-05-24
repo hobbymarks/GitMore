@@ -1,9 +1,10 @@
+from setuptools import find_packages
 from setuptools import setup
 
 setup(
     name='giat@hobbymarks',
     version='2021.05',
-    packages=[''],
+    packages=find_packages('.'),
     url='https://github.com/hobbymarks/giat',
     license='MIT',
     author='HobbyMarks',
