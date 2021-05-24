@@ -134,7 +134,7 @@ def gitx(repo_path: Path):
 @click.argument("path", required=False, type=click.Path(exists=True), nargs=-1)
 @click.option("--max-depth",
               "-d",
-              default=1,
+              default=2,
               type=int,
               help=f"Set travel directory tree with max depth.",
               show_default=True)
