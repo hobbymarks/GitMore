@@ -1,0 +1,97 @@
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+:source-highlighter: coderay
+
+
+==  GIAT
+:toc:
+
+
+===  Introduction
+
+A tool for changing local Git Repo Directory name to GitRepoName@OrganizationName format.It was programmed by link:++https://www.python.org/++[Python] language.
+
+===  Installation
+
+To install giat via link:++https://www.anaconda.com/products/individual++[conda]:
+
+[sub="attributes"]
+[source,shell script]
+----
+$ conda install -c hobbymarks giat
+----
+
+[#_usage_options]
+===  Usage/参数
+
+Options:
+
+[sub="attributes"]
+----
+Usage: giat [OPTIONS] [PATH]...
+
+Options:
+  -d, --max-depth INTEGER  Set travel directory tree with max depth.
+                           [default: 1]
+  -c, --confirm            Need confirmation before change to take
+                           effect.  [default: False]
+  -a, --absolute-path      Show absolute path of file.  [default: False]
+  --version                Show the version and exit.
+  -h, --help               Show this message and exit.
+----
+
+==== **[underline]#ATTENTION!#**
+
+[NOTE]
+====
+When you run giat ,mostly you will see two kinds of output:
+
+- First Kind
+
+   sample▯file▯name
+-->sample_file_name
+
+The output means: a file name `sample file name` will be changed to `sample_file_name`
+
+``-\->`` means in dry run mode ,operation not take effect.The character `▯` means space ,every space will be replaced by one `▯`.
+
+[underline]#**The character `▯` is only for the convenience of visual contrast and only display in output.**#
+
+or you will see:
+
+- Second Kind:
+
+   sample▯file▯name
+==>sample_file_name
+
+The output means: a file named `sample file name` has been changed to `sample_file_name`
+
+``=\=>`` means operation have taken effect.
+
+====
+
+[red]#all deleted character will be display as red color# ,such as the original file name:
+
+**sample [red]#▯# file [red]#▯# name**
+
+[green]#all added character will be diplay as green color# ,such as the changed file name:
+
+**sample [green]#\_# file [green]#_# name**
+
+
+
+
+=== 简介
+
+
+将本地Gir Repo目录名称更改为GitRepoName@OrganizationName的格式.
+
+
+==== 使用
+请前往<<_usage_options>>查看
