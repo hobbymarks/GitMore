@@ -16,7 +16,7 @@ from giat.giatcfg import gParamDict as gPD
 
 from giat import utils
 
-_ver = "2021.05.22.2618"
+_ver = "2021.05.31.2223"
 
 
 def _confirm(p_i: str = "") -> str:
@@ -88,38 +88,37 @@ def gitx(repo_path: Path):
             None if rlt is None else str(rlt[0]) + "@" + str(rlt[1])):
         return None
 
-    current_repo_name = str(os.path.realpath(repo_path)).rstrip(
-        os.path.sep).split(os.path.sep)[-1]
-    repo_dir_path = os.path.sep.join(
-        str(repo_path).rstrip(os.path.sep).split(os.path.sep)[:-1])
-    current_repo_path = os.path.join(repo_dir_path, current_repo_name)
-    new_repo_path = os.path.join(repo_dir_path, new_repo_name)
-    if os.path.realpath(current_repo_path) == os.path.realpath(new_repo_path):
+    cur_repo_name = str(os.path.realpath(repo_path)).rstrip(os.path.sep).split(
+        os.path.sep)[-1]
+    abs_repo_dir_path = os.path.sep.join(
+        str(os.path.realpath(repo_path)).rstrip(os.path.sep).split(
+            os.path.sep)[:-1])  # remove right sep if exist then delete current
+    # repo name
+    cur_repo_path = os.path.join(abs_repo_dir_path, cur_repo_name)
+    new_repo_path = os.path.join(abs_repo_dir_path, new_repo_name)
+    if os.path.realpath(cur_repo_path) == os.path.realpath(new_repo_path):
         return None
 
     _ap = gPD["absolute_path_flag"]
 
     if _ap:
-        ip = _in_place(os.path.abspath(current_repo_path))
+        ip = _in_place(cur_repo_path)
     else:
-        ip = _in_place(str(current_repo_path))
+        ip = _in_place(str(cur_repo_name))
     if ip:
         if os.path.exists(new_repo_path):
-            click.echo(f"{new_repo_path} exist.\n"
-                       f"{current_repo_path} Skipped.")
+            click.echo(f"{new_repo_path} exist.\n" f"{cur_repo_path} Skipped.")
             return None
 
         else:
             pass
-            os.replace(current_repo_path,
+            os.replace(cur_repo_path,
                        new_repo_path)  # os.place is atomic and match
             # cross platform :https://docs.python.org/dev/library/os.html
     if _ap:
-        _out_info(str(os.path.abspath(current_repo_path)),
-                  str(os.path.abspath(new_repo_path)),
-                  take_effect=ip)
+        _out_info(str(cur_repo_path), str(new_repo_path), take_effect=ip)
     else:
-        _out_info(str(current_repo_path), str(new_repo_path), take_effect=ip)
+        _out_info(str(cur_repo_name), str(new_repo_name), take_effect=ip)
 
     gPD["target_appeared"] = True
 
