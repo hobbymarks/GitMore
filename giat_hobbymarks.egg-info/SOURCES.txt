@@ -1,0 +1,14 @@
+setup.py
+giat/__init__.py
+giat/__main__.py
+giat/giatcfg.py
+giat/giatcli.py
+giat/utils.py
+giat_hobbymarks.egg-info/PKG-INFO
+giat_hobbymarks.egg-info/SOURCES.txt
+giat_hobbymarks.egg-info/dependency_links.txt
+giat_hobbymarks.egg-info/entry_points.txt
+giat_hobbymarks.egg-info/top_level.txt
+tests/__init__.py
+tests/test_X.py
+tests/test_giat.py

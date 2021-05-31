@@ -1,0 +1,14 @@
+Metadata-Version: 1.1
+Name: giat-hobbymarks
+Version: 2021.5.31
+Summary: Change Local Git Repo Directory name to Git@Org Style
+Home-page: https://github.com/hobbymarks/giat
+Author: HobbyMarks
+Author-email: ihobbymarks@gmail.com
+License: MIT
+Description: Change Local Git Repo Directory name to Git@Org Style
+Platform: UNKNOWN
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
