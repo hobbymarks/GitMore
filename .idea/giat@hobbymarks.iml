@@ -7,6 +7,9 @@
       <excludeFolder url="file://$MODULE_DIR$/giat/.ipynb_checkpoints" />
       <excludeFolder url="file://$MODULE_DIR$/giat/log" />
       <excludeFolder url="file://$MODULE_DIR$/tests/4T" />
+      <excludeFolder url="file://$MODULE_DIR$/giat_hobbymarks.egg-info" />
+      <excludeFolder url="file://$MODULE_DIR$/build" />
+      <excludeFolder url="file://$MODULE_DIR$/dist" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.8 (giat@hobbymarks)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
