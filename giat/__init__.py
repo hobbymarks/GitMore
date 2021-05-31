@@ -28,9 +28,13 @@ def main() -> None:
         colorama.deinit()
 
 
-if __name__ == '__main__':
+def run_main():
     try:
         sys.exit(main())
     except Exception as e:
         sys.stderr.write(f"Error:{str(e)}\n")
         sys.exit(1)
+
+
+if __name__ == '__main__':
+    run_main()

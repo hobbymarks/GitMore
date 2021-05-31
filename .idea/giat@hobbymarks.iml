@@ -6,6 +6,7 @@
       <excludeFolder url="file://$MODULE_DIR$/htmlcov" />
       <excludeFolder url="file://$MODULE_DIR$/giat/.ipynb_checkpoints" />
       <excludeFolder url="file://$MODULE_DIR$/giat/log" />
+      <excludeFolder url="file://$MODULE_DIR$/tests/4T" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.8 (giat@hobbymarks)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
