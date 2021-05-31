@@ -1,5 +1,5 @@
-{% set ver = "XXXX.XX.XX" %}
-{% set num = "XXXX" %}
+{% set ver = "2021.05.31" %}
+{% set num = "1043" %}
 
 package:
     name: giat
