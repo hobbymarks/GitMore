@@ -13,6 +13,7 @@ num=$(date '+%H%M')
 
 sed -i "s/.*{% set ver = \".*\" %}.*/{% set ver = \"$ver\" %}/" meta.yaml
 sed -i "s/.*{% set num = \".*\" %}.*/{% set num = \"$num\" %}/" meta.yaml
+#sed -i "s/.*_ver.*=.*\".*\".*/_ver = \"$ver.$num\"/" giat/giatlib/giatcli.py
 
 # building conda packages
 for i in "${array[@]}"; do
@@ -22,6 +23,7 @@ done
 # clear setting
 sed -i "s/.*{% set ver = \".*\" %}.*/{% set ver = \"XXXX.XX.XX\" %}/" meta.yaml
 sed -i "s/.*{% set num = \".*\" %}.*/{% set num = \"XXXX\" %}/" meta.yaml
+#sed -i "s/.*_ver.*=.*\".*\".*/_ver = \"XXXX.XX.XX\"/" giat/giatlib/giatcli.py
 
 printf '%*s\n\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 ###############################################################################
@@ -49,6 +51,19 @@ else
 fi
 
 printf '%*s\n\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
+###############################################################################
+printf 'Please check anaconda current user information'
+printf '\n'
+printf '********************************************'
+printf '\n'
+anaconda whoami
+printf '********************************************'
+printf '\n'
+read -p "User information is right? yes/[no] " -r
+printf '\n'
+if [[ $REPLY =~ ^[Nn][Oo]$ ]]; then
+  anaconda login
+fi
 ###############################################################################
 read -p "Upload to anaconda? yes/[no] " -r
 printf '\n'
