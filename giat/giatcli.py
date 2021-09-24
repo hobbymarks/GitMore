@@ -16,7 +16,7 @@ from giat.giatcfg import gParamDict as gPD
 
 from giat import utils
 
-_ver = "2021.05.31.2223"
+_ver = "2021.09.24.2924"
 
 
 def _confirm(p_i: str = "") -> str:
@@ -31,6 +31,8 @@ def _confirm(p_i: str = "") -> str:
 
 def _in_place(p_i: str = "") -> bool:
     if gPD["need_confirmation_flag"]:
+        if gPD["latest_confirm"] == utils.unify_confirm("all"):
+            return True
         if (c := _confirm(p_i)) == utils.unify_confirm("yes"):
             gPD["latest_confirm"] = c
             return True
