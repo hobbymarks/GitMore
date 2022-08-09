@@ -39,11 +39,11 @@ var listCmd = &cobra.Command{
 			if err != nil {
 				log.Error(err)
 			} else {
-				for _, d := range dirs {
-					gpath := filepath.Join(d, ".git")
-					if _, err := os.Stat(gpath); !os.IsNotExist(err) {
-						fmt.Println(d)
-					}
+				gitDirs, err := GitDirs(dirs)
+				if err != nil {
+					log.Error(err)
+				} else {
+					fmt.Println(gitDirs)
 				}
 			}
 		}
@@ -64,8 +64,27 @@ func init() {
 	// listCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
+func GitDirs(rootDirs []string) ([]string, error) {
+	var gitDirs []string
+
+	for _, d := range rootDirs {
+		gpath := filepath.Join(d, ".git")
+		if _, err := os.Stat(gpath); !os.IsNotExist(err) {
+			abs, err := filepath.Abs(d)
+			if err != nil {
+				log.Error(err)
+			} else {
+				gitDirs = append(gitDirs, abs)
+			}
+		}
+	}
+
+	return gitDirs, nil
+}
+
 func Dirs(rootPath string) ([]string, error) {
 	var dirs []string
+
 	rootPath = filepath.Clean(rootPath)
 	log.Trace(rootPath)
 	err := filepath.WalkDir(rootPath, func(path string, info fs.DirEntry, err error) error {
