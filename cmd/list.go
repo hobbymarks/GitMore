@@ -19,18 +19,32 @@ var listCmd = &cobra.Command{
 	Short: "list all git managed directory",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		rootPath := "./"
+		var roots []string
+
 		if len(args) >= 1 {
-			rootPath = args[0]
+			for _, arg := range args {
+				_, err := os.Stat(arg)
+				if err != nil {
+					log.Warning(err)
+				} else {
+					roots = append(roots, arg)
+				}
+			}
+		} else {
+			roots = []string{"./"}
 		}
-		dirs, err := Dirs(rootPath)
-		if err != nil {
-			log.Fatal(err)
-		}
-		for _, d := range dirs {
-			gitPath := filepath.Join(d, ".git")
-			if _, err := os.Stat(gitPath); !os.IsNotExist(err) {
-				fmt.Println(d)
+
+		for _, root := range roots {
+			dirs, err := Dirs(root)
+			if err != nil {
+				log.Error(err)
+			} else {
+				for _, d := range dirs {
+					gpath := filepath.Join(d, ".git")
+					if _, err := os.Stat(gpath); !os.IsNotExist(err) {
+						fmt.Println(d)
+					}
+				}
 			}
 		}
 	},
