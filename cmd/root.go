@@ -12,10 +12,14 @@ import (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "giat",
-	Short: "unify git managed direcotry names",
-	Long: `A tool for unify directory names when these directory contain code managed by git.
+	Short: "unify local GitRepoDirecotry name",
+	Long: `
+A tool for changing local GitRepoDirectory name to GitRepoName@OrganizationName.
 For example:
-ProjectDir change to .`,
+	ProjectDir ==> GitRepoName@OrganizationName
+	GiatLocalDir ==> giat@hobbymarks
+	...
+`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },

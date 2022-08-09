@@ -15,7 +15,7 @@ endif::[]
 
 ===  Introduction
 
-A tool for changing local Git Repo Directory name to GitRepoName@OrganizationName format.It was programmed by link:++https://www.python.org/++[Python] language.
+A tool for changing local Git Repo Directory name to GitRepoName@OrganizationName format.It was programmed by link:++https://go.dev/++[golang] language.
 
 ===  Installation
 
