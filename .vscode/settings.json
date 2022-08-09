@@ -1,0 +1,9 @@
+{
+    "editor.language.brackets": [
+    
+    ],
+    "editor.fontFamily": "JetBrains Mono",
+    "editor.fontSize": 13,
+    "editor.fontLigatures": true,
+    "gopls": { "ui.semanticTokens": true }
+}
