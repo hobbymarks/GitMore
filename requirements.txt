@@ -1,5 +1,0 @@
-click>=7.1.2
-setuptools>=49.6.0
-pytest>=6.2.3
-colorama>=0.4.4
-wcwidth>=0.2.5
