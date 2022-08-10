@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"regexp"
+	"strings"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -34,6 +35,16 @@ to quickly create a Cobra application.`,
 			if err != nil {
 				log.Error(err)
 			} else {
+				switch confirm() {
+				case A, All:
+					fmt.Println("ALL==>")
+				case Y, Yes:
+					fmt.Println("YES==>")
+				case N, No:
+					fmt.Println("NO==>")
+				case Q, Quit:
+					fmt.Println("QUIT==>")
+				}
 				fmt.Printf("%s-->%s\n", gdir, gr)
 			}
 		}
@@ -51,7 +62,7 @@ func init() {
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// unifyCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	unifyCmd.Flags().BoolP("confirm", "c", false, "Confirm unify git direcotry name")
 }
 
 func DecodeGitConfig(configPath string) (string, error) {
@@ -73,3 +84,25 @@ func DecodeGitConfig(configPath string) (string, error) {
 
 	return string(result), nil
 }
+
+func confirm() UserInput {
+	var cmsg string
+
+	fmt.Print("Please confirm (all,yes,no,quit):")
+	fmt.Scan(&cmsg)
+
+	return UserInput(strings.ToLower(cmsg))
+}
+
+type UserInput string
+
+const (
+	All  UserInput = "all"
+	A    UserInput = "a"
+	Yes  UserInput = "yes"
+	Y    UserInput = "y"
+	No   UserInput = "no"
+	N    UserInput = "n"
+	Quit UserInput = "quit"
+	Q    UserInput = "q"
+)
