@@ -44,6 +44,9 @@ to quickly create a Cobra application.`,
 			if err != nil {
 				log.Error(err)
 			} else {
+				if len(gr) == 0 {
+					continue
+				}
 				if inplace {
 					fmt.Printf("%s==>%s\n", gdir, gr)
 				} else {
@@ -95,9 +98,10 @@ func DecodeGitConfig(configPath string) (string, error) {
 	for _, submatches := range pattern.FindAllSubmatchIndex(content, -1) {
 		result = pattern.Expand(result, template, content, submatches)
 	}
-	log.Trace(string(result))
+	gr := string(result)
+	log.Trace(gr)
 
-	return string(result), nil
+	return gr, nil
 }
 
 func confirm() UserInput {

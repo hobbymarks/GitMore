@@ -44,7 +44,7 @@ func init() {
 
 func AllGitDirs(rootPaths []string) ([]string, error) {
 	var roots []string
-	var rlts []string
+	var results []string
 
 	if len(rootPaths) >= 1 {
 		for _, arg := range rootPaths {
@@ -69,12 +69,12 @@ func AllGitDirs(rootPaths []string) ([]string, error) {
 				log.Error(err)
 			} else {
 				log.Trace(gitDirs)
-				rlts = append(rlts, gitDirs...)
+				results = append(results, gitDirs...)
 			}
 		}
 	}
 
-	return rlts, nil
+	return results, nil
 }
 
 func GitDirs(rootDirs []string) ([]string, error) {
