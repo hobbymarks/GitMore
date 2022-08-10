@@ -19,33 +19,11 @@ var listCmd = &cobra.Command{
 	Short: "list all git managed directory",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		var roots []string
-
-		if len(args) >= 1 {
-			for _, arg := range args {
-				_, err := os.Stat(arg)
-				if err != nil {
-					log.Warning(err)
-				} else {
-					roots = append(roots, arg)
-				}
-			}
+		rlts, err := AllGitDirs(args)
+		if err != nil {
+			log.Error(err)
 		} else {
-			roots = []string{"./"}
-		}
-
-		for _, root := range roots {
-			dirs, err := Dirs(root)
-			if err != nil {
-				log.Error(err)
-			} else {
-				gitDirs, err := GitDirs(dirs)
-				if err != nil {
-					log.Error(err)
-				} else {
-					fmt.Println(gitDirs)
-				}
-			}
+			fmt.Println(rlts)
 		}
 	},
 }
@@ -62,6 +40,41 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// listCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
+
+func AllGitDirs(rootPaths []string) ([]string, error) {
+	var roots []string
+	var rlts []string
+
+	if len(rootPaths) >= 1 {
+		for _, arg := range rootPaths {
+			_, err := os.Stat(arg)
+			if err != nil {
+				log.Warning(err)
+			} else {
+				roots = append(roots, arg)
+			}
+		}
+	} else {
+		roots = []string{"./"}
+	}
+
+	for _, root := range roots {
+		dirs, err := Dirs(root)
+		if err != nil {
+			log.Error(err)
+		} else {
+			gitDirs, err := GitDirs(dirs)
+			if err != nil {
+				log.Error(err)
+			} else {
+				log.Trace(gitDirs)
+				rlts = append(rlts, gitDirs...)
+			}
+		}
+	}
+
+	return rlts, nil
 }
 
 func GitDirs(rootDirs []string) ([]string, error) {
