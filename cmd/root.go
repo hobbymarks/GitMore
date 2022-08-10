@@ -9,12 +9,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var version = "0.0.0"
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "giat",
-	Short: "unify local GitRepoDirecotry name",
-	Long: `
-A tool for changing local GitRepoDirectory name to GitRepoName@OrganizationName.
+	Use:     "giat",
+	Version: version,
+	Short:   "unify local GitRepoDirecotry name",
+	Long: `A tool for changing local GitRepoDirectory name to GitRepoName@OrganizationName.
 For example:
 	ProjectDir ==> GitRepoName@OrganizationName
 	GiatLocalDir ==> giat@hobbymarks
