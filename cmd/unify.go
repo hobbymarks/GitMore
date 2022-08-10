@@ -19,12 +19,10 @@ import (
 var unifyCmd = &cobra.Command{
 	Use:   "unify",
 	Short: "unify git directory name",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Long: `changing local GitRepoDirectory name to GitRepoName@OrganizationName:
+ProjectDir ==> GitRepoName@OrganizationName
+GiatLocalDir ==> giat@hobbymarks
+...`,
 	Run: func(cmd *cobra.Command, args []string) {
 		inplace, err := cmd.Flags().GetBool("inplace")
 		if err != nil {
@@ -39,25 +37,39 @@ to quickly create a Cobra application.`,
 			log.Error(err)
 			return
 		}
-		for _, gdir := range dirs {
-			gr, err := DecodeGitConfig(filepath.Join(gdir, ".git/config"))
+		unifyGitRepo := func(gdir string, gro string) {
+			dir, _ := filepath.Split(gdir)
+			err := os.Rename(gdir, filepath.Join(dir, gro))
 			if err != nil {
 				log.Error(err)
 			} else {
-				if len(gr) == 0 {
+				fmt.Printf("%s==>%s\n", gdir, gro)
+			}
+		}
+		for _, gdir := range dirs {
+			gro, err := DecodeGitConfig(filepath.Join(gdir, ".git/config"))
+			if err != nil {
+				log.Error(err)
+			} else {
+				if len(gro) == 0 {
+					continue
+				}
+				_, file := filepath.Split(gdir)
+				if file == gro {
+					log.Trace("NoNeed:", gdir)
 					continue
 				}
 				if inplace {
-					fmt.Printf("%s==>%s\n", gdir, gr)
+					unifyGitRepo(gdir, gro)
 				} else {
-					fmt.Printf("%s-->%s\n", gdir, gr)
+					fmt.Printf("%s-->%s\n", gdir, gro)
 					if cfm {
 						switch confirm() {
 						case A, All:
 							inplace = true
-							fmt.Printf("%s==>%s\n", gdir, gr)
+							unifyGitRepo(gdir, gro)
 						case Y, Yes:
-							fmt.Printf("%s==>%s\n", gdir, gr)
+							unifyGitRepo(gdir, gro)
 						case N, No:
 							continue
 						case Q, Quit:
@@ -72,12 +84,6 @@ to quickly create a Cobra application.`,
 
 func init() {
 	rootCmd.AddCommand(unifyCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// unifyCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	unifyCmd.Flags().BoolP("confirm", "c", false, "Confirm unify git direcotry name")
 	unifyCmd.Flags().BoolP("inplace", "i", false, "Unify git direcotry name inplace")
