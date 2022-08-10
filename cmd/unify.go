@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -25,6 +26,14 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		inplace, err := cmd.Flags().GetBool("inplace")
+		if err != nil {
+			log.Fatal(err)
+		}
+		cfm, err := cmd.Flags().GetBool("confirm")
+		if err != nil {
+			log.Fatal(err)
+		}
 		dirs, err := AllGitDirs(args)
 		if err != nil {
 			log.Error(err)
@@ -35,17 +44,24 @@ to quickly create a Cobra application.`,
 			if err != nil {
 				log.Error(err)
 			} else {
-				switch confirm() {
-				case A, All:
-					fmt.Println("ALL==>")
-				case Y, Yes:
-					fmt.Println("YES==>")
-				case N, No:
-					fmt.Println("NO==>")
-				case Q, Quit:
-					fmt.Println("QUIT==>")
+				if inplace {
+					fmt.Printf("%s==>%s\n", gdir, gr)
+				} else {
+					fmt.Printf("%s-->%s\n", gdir, gr)
+					if cfm {
+						switch confirm() {
+						case A, All:
+							inplace = true
+							fmt.Printf("%s==>%s\n", gdir, gr)
+						case Y, Yes:
+							fmt.Printf("%s==>%s\n", gdir, gr)
+						case N, No:
+							continue
+						case Q, Quit:
+							os.Exit(0)
+						}
+					}
 				}
-				fmt.Printf("%s-->%s\n", gdir, gr)
 			}
 		}
 	},
@@ -60,9 +76,8 @@ func init() {
 	// and all subcommands, e.g.:
 	// unifyCmd.PersistentFlags().String("foo", "", "A help for foo")
 
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
 	unifyCmd.Flags().BoolP("confirm", "c", false, "Confirm unify git direcotry name")
+	unifyCmd.Flags().BoolP("inplace", "i", false, "Unify git direcotry name inplace")
 }
 
 func DecodeGitConfig(configPath string) (string, error) {
