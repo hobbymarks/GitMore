@@ -1,5 +1,5 @@
 /*
-Copyright © 2022 NAME HERE <EMAIL ADDRESS>
+Copyright © 2022 hobbymarks ihobbymarks@gmail.com
 */
 package cmd
 
@@ -150,19 +150,17 @@ const (
 )
 
 func noEffectTip() {
-	var tips string
+	var tipsDivider string
 
 	if term.IsTerminal(0) {
 		tw, _, err := term.GetSize(0)
 		if err != nil {
 			log.Error(err)
-			tips = strings.Repeat("*", 80)
+			tipsDivider = strings.Repeat("*", 80)
 		} else {
-			tips = strings.Repeat("*", tw)
+			tipsDivider = strings.Repeat("*", tw)
 		}
-	} else {
-		tips = strings.Repeat("*", 40)
+		fmt.Println(tipsDivider)
+		fmt.Println("--> 'will change to' ==> 'changed to',in order to take effect,add flag '-i' or '-c'")
 	}
-	fmt.Println(tips)
-	fmt.Println("--> 'will change to' ==> 'changed to',in order to take effect,add flag '-i' or '-c'")
 }
