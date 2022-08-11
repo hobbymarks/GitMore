@@ -89,13 +89,6 @@ GiatLocalDir ==> giat@hobbymarks
 		if PrintTipFlag {
 			noEffectTip()
 		}
-		//
-		// ws, err := GetWinSize()
-		// if err != nil {
-		// 	log.Error(err)
-		// } else {
-		// 	fmt.Println(ws)
-		// }
 	},
 }
 
