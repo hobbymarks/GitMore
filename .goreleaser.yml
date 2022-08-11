@@ -6,6 +6,8 @@ builds:
     goarch:
       - amd64
       - arm64
+    ldflags:
+      - -s -w -X github.com/hobbymarks/giat/cmd.version={{.Version}}
     env:
       - CGO_ENABLED=0
     flags:
@@ -18,8 +20,7 @@ universal_binaries:
   - replace: true
 
 brews:
-  -
-    name: giat
+  - name: giat
     homepage: "https://github.com/hobbymarks/giat"
     tap:
       owner: hobbymarks
@@ -29,4 +30,4 @@ brews:
       email: ihobbymarks@gmail.com
 
 checksum:
-  name_template: 'checksums.txt'
+  name_template: "checksums.txt"
