@@ -19,11 +19,13 @@ var listCmd = &cobra.Command{
 	Short: "list all git managed directory",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		rlts, err := AllGitDirs(args)
+		results, err := AllGitDirs(args)
 		if err != nil {
 			log.Error(err)
 		} else {
-			fmt.Println(rlts)
+			for _, repo := range results {
+				fmt.Println(repo)
+			}
 		}
 	},
 }
