@@ -34,16 +34,20 @@ Options:
 
 [sub="attributes"]
 ----
-Usage: giat [OPTIONS] [PATH]...
+Usage:
+  giat [command]
 
-Options:
-  -d, --max-depth INTEGER  Set travel directory tree with max depth.
-                           [default: 1]
-  -c, --confirm            Need confirmation before change to take
-                           effect.  [default: False]
-  -a, --absolute-path      Show absolute path of file.  [default: False]
-  --version                Show the version and exit.
-  -h, --help               Show this message and exit.
+Available Commands:
+  completion  Generate the autocompletion script for the specified shell
+  help        Help about any command
+  list        list all git managed directory
+  unify       unify git directory name
+
+Flags:
+  -h, --help      help for giat
+  -v, --version   version for giat
+
+Use "giat [command] --help" for more information about a command.
 ----
 
 ==== **[underline]#ATTENTION!#**
