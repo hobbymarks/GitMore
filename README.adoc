@@ -19,12 +19,13 @@ A tool for changing local Git Repo Directory name to GitRepoName@OrganizationNam
 
 ===  Installation
 
-To install giat via link:++https://www.anaconda.com/products/individual++[conda]:
+To install giat via link:++https://brew.sh/++[homebrew]:
 
 [sub="attributes"]
 [source,shell script]
 ----
-$ conda install -c hobbymarks giat
+$ brew tap hobbymarks/hobbymarks
+$ brew install giat
 ----
 
 [#_usage_options]
