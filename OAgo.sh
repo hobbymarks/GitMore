@@ -13,7 +13,7 @@ app="giat"
 
 ##get version
 # ver=$(git tag -l --sort=-creatordate | head -n 1)
-ver="0.0.3"
+ver="0.5.7"
 ##get commit index
 # cidx=$(git rev-parse HEAD | cut -c1-7)
 ##get build date

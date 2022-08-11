@@ -12,6 +12,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"golang.org/x/term"
 	"gopkg.in/ini.v1"
 )
 
@@ -148,36 +149,20 @@ const (
 	Q    UserInput = "q"
 )
 
-// const (
-// 	_TIOCGWINSZ     = 0x5413
-// 	_TIOCGWINSZ_OSX = 1074295912
-// )
-
-// type winSize struct {
-// 	Row    uint16
-// 	Col    uint16
-// 	Xpixel uint16
-// 	Ypixel uint16
-// }
-
-// func GetWinSize() (*winSize, error) {
-// 	ws := new(winSize)
-// 	tio := _TIOCGWINSZ
-// 	if runtime.GOOS == "darwin" {
-// 		tio = _TIOCGWINSZ_OSX
-// 	}
-// 	res, _, err := syscall.Syscall(syscall.SYS_IOCTL,
-// 		uintptr(syscall.Stdin),
-// 		uintptr(tio),
-// 		uintptr(unsafe.Pointer(ws)),
-// 	)
-// 	if int(res) == -1 {
-// 		return nil, os.NewSyscallError("GetWinSize", err)
-// 	}
-// 	return ws, nil
-// }
-
 func noEffectTip() {
-	fmt.Println("****************************************")
-	fmt.Println("--> 'dry run' ==> 'changed to',in order to take effect,add flag '-i' or '-c'")
+	var tips string
+
+	if term.IsTerminal(0) {
+		tw, _, err := term.GetSize(0)
+		if err != nil {
+			log.Error(err)
+			tips = strings.Repeat("*", 80)
+		} else {
+			tips = strings.Repeat("*", tw)
+		}
+	} else {
+		tips = strings.Repeat("*", 40)
+	}
+	fmt.Println(tips)
+	fmt.Println("--> 'will change to' ==> 'changed to',in order to take effect,add flag '-i' or '-c'")
 }
