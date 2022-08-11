@@ -32,6 +32,9 @@ GiatLocalDir ==> giat@hobbymarks
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		PrintTipFlag := false
+
 		dirs, err := AllGitDirs(args)
 		if err != nil {
 			log.Error(err)
@@ -71,14 +74,27 @@ GiatLocalDir ==> giat@hobbymarks
 						case Y, Yes:
 							unifyGitRepo(gdir, gro)
 						case N, No:
+							// PrintTipFlag = true
 							continue
 						case Q, Quit:
 							os.Exit(0)
 						}
+					} else {
+						PrintTipFlag = true
 					}
 				}
 			}
 		}
+		if PrintTipFlag {
+			noEffectTip()
+		}
+		//
+		// ws, err := GetWinSize()
+		// if err != nil {
+		// 	log.Error(err)
+		// } else {
+		// 	fmt.Println(ws)
+		// }
 	},
 }
 
@@ -131,3 +147,37 @@ const (
 	Quit UserInput = "quit"
 	Q    UserInput = "q"
 )
+
+// const (
+// 	_TIOCGWINSZ     = 0x5413
+// 	_TIOCGWINSZ_OSX = 1074295912
+// )
+
+// type winSize struct {
+// 	Row    uint16
+// 	Col    uint16
+// 	Xpixel uint16
+// 	Ypixel uint16
+// }
+
+// func GetWinSize() (*winSize, error) {
+// 	ws := new(winSize)
+// 	tio := _TIOCGWINSZ
+// 	if runtime.GOOS == "darwin" {
+// 		tio = _TIOCGWINSZ_OSX
+// 	}
+// 	res, _, err := syscall.Syscall(syscall.SYS_IOCTL,
+// 		uintptr(syscall.Stdin),
+// 		uintptr(tio),
+// 		uintptr(unsafe.Pointer(ws)),
+// 	)
+// 	if int(res) == -1 {
+// 		return nil, os.NewSyscallError("GetWinSize", err)
+// 	}
+// 	return ws, nil
+// }
+
+func noEffectTip() {
+	fmt.Println("****************************************")
+	fmt.Println("--> 'dry run' ==> 'changed to',in order to take effect,add flag '-i' or '-c'")
+}
