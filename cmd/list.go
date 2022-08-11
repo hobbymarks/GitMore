@@ -47,6 +47,7 @@ func AllGitDirs(rootPaths []string) ([]string, error) {
 				roots = append(roots, arg)
 			}
 		}
+		//FIXME:should merge paths
 	} else {
 		roots = []string{"./"}
 	}
@@ -65,7 +66,8 @@ func AllGitDirs(rootPaths []string) ([]string, error) {
 			}
 		}
 	}
-
+	//TODO:support colorfull output
+	//TODO:supoort output grouped,such as by directory or by arg ...
 	return results, nil
 }
 
@@ -96,9 +98,9 @@ func Dirs(rootPath string) ([]string, error) {
 		if err != nil {
 			log.WithFields(log.Fields{
 				"Call": "filepath.WalkDir",
-			}).Trace(err)
+			}).Error(err)
 			return err
-			//TODO:should check error type,some error should ignore,such as permission ...
+			//FIXME:should check error type,some error should ignore,such as permission ...
 		}
 		if info.IsDir() {
 			log.Trace("IsDir:", path)
