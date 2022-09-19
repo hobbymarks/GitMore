@@ -1,0 +1,26 @@
+// [START declaration]
+syntax="proto3";
+
+package main;
+import "google/protobuf/timestamp.proto";
+// [END declaration]
+
+// [START go_declaration]
+option go_package = "/pb";
+// [END go_declaration]
+
+// [START message]
+
+message GiatRecords{
+    repeated GRecord GRecords=6;
+
+    google.protobuf.Timestamp LastUpdated=15;
+}
+
+message GRecord{
+    string PreviousName=1;
+    string CurrentName=2;
+
+    google.protobuf.Timestamp LastUpdated=15;
+}
+// [END message]

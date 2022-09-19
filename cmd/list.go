@@ -19,6 +19,7 @@ var listCmd = &cobra.Command{
 	Short: "list all git managed directory",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println(giatRecordPath)
 		results, err := AllGitDirs(args)
 		if err != nil {
 			log.Error(err)
