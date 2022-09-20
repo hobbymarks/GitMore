@@ -19,7 +19,7 @@ import (
 // unifyCmd represents the unify command
 var unifyCmd = &cobra.Command{
 	Use:   "unify",
-	Short: "unify git directory name",
+	Short: "Unify git directory name",
 	Long: `changing local GitRepoDirectory name to GitRepoName@OrganizationName:
 ProjectDir ==> GitRepoName@OrganizationName
 GiatLocalDir ==> giat@hobbymarks
@@ -51,7 +51,7 @@ GiatLocalDir ==> giat@hobbymarks
 			}
 		}
 		for _, gdir := range dirs {
-			gro, err := DecodeGitConfig(filepath.Join(gdir, ".git/config"))
+			_, gro, err := DecodeGitConfig(filepath.Join(gdir, ".git/config"))
 			if err != nil {
 				log.Error(err)
 			} else {
@@ -99,10 +99,11 @@ func init() {
 	unifyCmd.Flags().BoolP("inplace", "i", false, "Unify git direcotry name inplace")
 }
 
-func DecodeGitConfig(configPath string) (string, error) {
+// return remoteURL,giatDirName,err
+func DecodeGitConfig(configPath string) (string, string, error) {
 	cfg, err := ini.Load(configPath)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	// pattern := regexp.MustCompile(`(github.com/(?P<org>\S+)/(?P<repo>\S+).git)|(github.com/(?P<org>\S+)/(?P<repo>\S+))`)
@@ -117,7 +118,7 @@ func DecodeGitConfig(configPath string) (string, error) {
 	gr := string(result)
 	log.Trace(gr)
 
-	return gr, nil
+	return string(content), gr, nil
 }
 
 func confirm() UserInput {

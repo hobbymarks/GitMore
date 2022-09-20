@@ -13,6 +13,7 @@ option go_package = "/pb";
 
 message GiatRecords{
     repeated GRecord GRecords=6;
+    repeated FreezedRecord FRecords=7;
 
     google.protobuf.Timestamp LastUpdated=15;
 }
@@ -20,6 +21,14 @@ message GiatRecords{
 message GRecord{
     string PreviousName=1;
     string CurrentName=2;
+    string RemoteURL=3;
+
+    google.protobuf.Timestamp LastUpdated=15;
+}
+
+message FreezedRecord{
+    string BaseName=1;
+    string RemoteURL=2;
 
     google.protobuf.Timestamp LastUpdated=15;
 }

@@ -16,7 +16,7 @@ import (
 // listCmd represents the list command
 var listCmd = &cobra.Command{
 	Use:   "list",
-	Short: "list all git managed directory",
+	Short: "List all git managed directory",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println(giatRecordPath)
@@ -97,9 +97,7 @@ func Dirs(rootPath string) ([]string, error) {
 	log.Trace(rootPath)
 	err := filepath.WalkDir(rootPath, func(path string, info fs.DirEntry, err error) error {
 		if err != nil {
-			log.WithFields(log.Fields{
-				"Call": "filepath.WalkDir",
-			}).Error(err)
+			log.Error(err)
 			return err
 			//FIXME:should check error type,some error should ignore,such as permission ...
 		}

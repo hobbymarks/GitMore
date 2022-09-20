@@ -8,8 +8,10 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/hobbymarks/giat/pb"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"google.golang.org/protobuf/proto"
 )
 
 var version = "0.0.0"
@@ -39,7 +41,7 @@ func Execute() {
 }
 
 func init() {
-	homeDir, err := os.UserHomeDir()
+	homeDir, err := os.UserHomeDir() //get home dir
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -47,6 +49,17 @@ func init() {
 	if _, err := os.Lstat(giatRecordPath); errors.Is(err, os.ErrNotExist) {
 		err := os.Mkdir(giatRecordPath, os.ModePerm)
 		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	giatRecordPath = filepath.Join(giatRecordPath, "giat.rd")
+	if _, err := os.Stat(giatRecordPath); err != nil { //if not exist then create
+		giatrds := pb.GiatRecords{}
+		data, err := proto.Marshal(&giatrds)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if err := os.WriteFile(giatRecordPath, data, 0644); err != nil {
 			log.Fatal(err)
 		}
 	}
