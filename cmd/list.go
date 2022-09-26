@@ -67,16 +67,20 @@ func AllGitDirs(rootPaths []string) ([]string, error) {
 	return results, nil
 }
 
+// filter gitdir from rootDirs
 func GitDirs(rootDirs []string) ([]string, error) {
 	var gitDirs []string
 
 	for _, d := range rootDirs {
-		gpath := filepath.Join(d, ".git")
-		if _, err := os.Stat(gpath); !os.IsNotExist(err) {
-			if abs, err := filepath.Abs(d); err != nil {
-				log.Error(err)
-			} else {
-				gitDirs = append(gitDirs, abs)
+		if ok, err := IsGitDir(d); err != nil {
+			log.Error(err)
+		} else {
+			if ok {
+				if abs, err := filepath.Abs(d); err != nil {
+					log.Error(err)
+				} else {
+					gitDirs = append(gitDirs, abs)
+				}
 			}
 		}
 	}
@@ -84,6 +88,7 @@ func GitDirs(rootDirs []string) ([]string, error) {
 	return gitDirs, nil
 }
 
+// return all dirs path in rootPath
 func Dirs(rootPath string) ([]string, error) {
 	var dirs []string
 
@@ -111,4 +116,16 @@ func Dirs(rootPath string) ([]string, error) {
 	}
 
 	return dirs, nil
+}
+
+func IsGitDir(dirPath string) (bool, error) {
+	gpath := filepath.Join(dirPath, ".git")
+	if _, err := os.Stat(gpath); err != nil {
+		if os.IsNotExist(err) {
+			return false, nil
+		} else {
+			return false, err
+		}
+	}
+	return true, nil
 }
