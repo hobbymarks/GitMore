@@ -47,20 +47,19 @@ func init() {
 	}
 	giatRecordPath = filepath.Join(homeDir, ".giat")
 	if _, err := os.Lstat(giatRecordPath); errors.Is(err, os.ErrNotExist) {
-		err := os.Mkdir(giatRecordPath, os.ModePerm)
-		if err != nil {
+		if err := os.Mkdir(giatRecordPath, os.ModePerm); err != nil {
 			log.Fatal(err)
 		}
 	}
 	giatRecordPath = filepath.Join(giatRecordPath, "giat.rd")
 	if _, err := os.Stat(giatRecordPath); err != nil { //if not exist then create
 		giatrds := pb.GiatRecords{}
-		data, err := proto.Marshal(&giatrds)
-		if err != nil {
+		if data, err := proto.Marshal(&giatrds); err != nil {
 			log.Fatal(err)
-		}
-		if err := os.WriteFile(giatRecordPath, data, 0644); err != nil {
-			log.Fatal(err)
+		} else {
+			if err := os.WriteFile(giatRecordPath, data, 0644); err != nil {
+				log.Fatal(err)
+			}
 		}
 	}
 }

@@ -43,16 +43,14 @@ GiatLocalDir ==> giat@hobbymarks
 		}
 		unifyGitRepo := func(gdir string, gro string) {
 			dir, _ := filepath.Split(gdir)
-			err := os.Rename(gdir, filepath.Join(dir, gro))
-			if err != nil {
+			if err := os.Rename(gdir, filepath.Join(dir, gro)); err != nil {
 				log.Error(err)
 			} else {
 				fmt.Printf("%s==>%s\n", gdir, gro)
 			}
 		}
 		for _, gdir := range dirs {
-			_, gro, err := DecodeGitConfig(filepath.Join(gdir, ".git/config"))
-			if err != nil {
+			if _, gro, err := DecodeGitConfig(filepath.Join(gdir, ".git/config")); err != nil {
 				log.Error(err)
 			} else {
 				if len(gro) == 0 {
@@ -147,8 +145,7 @@ func noEffectTip() {
 	var tipsDivider string
 
 	if term.IsTerminal(0) {
-		tw, _, err := term.GetSize(0)
-		if err != nil {
+		if tw, _, err := term.GetSize(0); err != nil {
 			log.Error(err)
 			tipsDivider = strings.Repeat("*", 80)
 		} else {

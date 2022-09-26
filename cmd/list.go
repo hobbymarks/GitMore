@@ -19,9 +19,7 @@ var listCmd = &cobra.Command{
 	Short: "List all git managed directory",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(giatRecordPath)
-		results, err := AllGitDirs(args)
-		if err != nil {
+		if results, err := AllGitDirs(args); err != nil {
 			log.Error(err)
 		} else {
 			for _, repo := range results {
@@ -41,8 +39,7 @@ func AllGitDirs(rootPaths []string) ([]string, error) {
 
 	if len(rootPaths) >= 1 {
 		for _, arg := range rootPaths {
-			_, err := os.Stat(arg)
-			if err != nil {
+			if _, err := os.Stat(arg); err != nil {
 				log.Warning(err)
 			} else {
 				roots = append(roots, arg)
@@ -50,16 +47,14 @@ func AllGitDirs(rootPaths []string) ([]string, error) {
 		}
 		//FIXME:should merge paths
 	} else {
-		roots = []string{"./"}
+		roots = []string{"."}
 	}
 
 	for _, root := range roots {
-		dirs, err := Dirs(root)
-		if err != nil {
+		if dirs, err := Dirs(root); err != nil {
 			log.Error(err)
 		} else {
-			gitDirs, err := GitDirs(dirs)
-			if err != nil {
+			if gitDirs, err := GitDirs(dirs); err != nil {
 				log.Error(err)
 			} else {
 				log.Trace(gitDirs)
@@ -78,8 +73,7 @@ func GitDirs(rootDirs []string) ([]string, error) {
 	for _, d := range rootDirs {
 		gpath := filepath.Join(d, ".git")
 		if _, err := os.Stat(gpath); !os.IsNotExist(err) {
-			abs, err := filepath.Abs(d)
-			if err != nil {
+			if abs, err := filepath.Abs(d); err != nil {
 				log.Error(err)
 			} else {
 				gitDirs = append(gitDirs, abs)
