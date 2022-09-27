@@ -41,12 +41,16 @@ GiatLocalDir ==> giat@hobbymarks
 			log.Error(err)
 			return
 		}
-		unifyGitRepo := func(gdir string, gro string) {
-			dir, _ := filepath.Split(gdir)
-			if err := os.Rename(gdir, filepath.Join(dir, gro)); err != nil {
+		unifyGitRepo := func(gdir string, gro string, rURL string) {
+			if err := AddGitRecord(filepath.Base(gdir), gro, rURL); err != nil {
 				log.Error(err)
 			} else {
-				fmt.Printf("%s==>%s\n", gdir, gro)
+				dir, _ := filepath.Split(gdir)
+				if err := os.Rename(gdir, filepath.Join(dir, gro)); err != nil {
+					log.Error(err)
+				} else {
+					fmt.Printf("%s==>%s\n", gdir, gro)
+				}
 			}
 		}
 		frds, err := FreezedGiatRecords()
@@ -62,25 +66,25 @@ GiatLocalDir ==> giat@hobbymarks
 					continue
 				}
 				if ok := ArrayContainsElemenet(frds, filepath.Base(gdir)+rURL); ok {
-					log.Trace("Freezed:" + filepath.Base(gdir) + rURL)
+					log.Info("Freezed:" + filepath.Base(gdir) + "@" + rURL)
 					continue
-				}
+				} //TODO:may need unify way ,such as add filter
 				_, file := filepath.Split(gdir)
 				if file == gro {
 					log.Trace("NoNeed:", gdir)
 					continue
 				}
 				if inplace {
-					unifyGitRepo(gdir, gro)
+					unifyGitRepo(gdir, gro, rURL)
 				} else {
 					fmt.Printf("%s-->%s\n", gdir, gro)
 					if cfm {
 						switch confirm() {
 						case A, All:
 							inplace = true
-							unifyGitRepo(gdir, gro)
+							unifyGitRepo(gdir, gro, rURL)
 						case Y, Yes:
-							unifyGitRepo(gdir, gro)
+							unifyGitRepo(gdir, gro, rURL)
 						case N, No:
 							// PrintTipFlag = true
 							continue

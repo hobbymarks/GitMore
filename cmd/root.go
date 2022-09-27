@@ -117,6 +117,35 @@ func FreezedGiatRecords() ([]string, error) {
 	return zgrds, nil
 }
 
+func AddGitRecord(dirName string, giatRepoName string, remoteURL string) error {
+	if data, err := os.ReadFile(GiatRecordPath); err != nil {
+		log.Error(err)
+		return err
+	} else {
+		giatrds := pb.GiatRecords{}
+		if err := proto.Unmarshal(data, &giatrds); err != nil {
+			log.Error(err)
+			return err
+		}
+		giatrds.GRecords = append(giatrds.GRecords, &pb.GRecord{
+			PreviousName: dirName,
+			CurrentName:  giatRepoName,
+			RemoteURL:    remoteURL,
+			LastUpdated:  timestamppb.Now()})
+		if data, err := proto.Marshal(&giatrds); err != nil {
+			log.Error(err)
+			return err
+		} else {
+			if err := os.WriteFile(GiatRecordPath, data, 0644); err != nil {
+				log.Error(err)
+				return err
+			}
+		}
+
+	}
+	return nil
+}
+
 func ArrayContainsElemenet[T comparable](s []T, e T) bool {
 	for _, v := range s {
 		if v == e {
