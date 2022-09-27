@@ -36,7 +36,7 @@ GiatLocalDir ==> giat@hobbymarks
 
 		PrintTipFlag := false
 
-		dirs, err := AllGitDirs(args)
+		gitDirs, err := AllGitDirs(args)
 		if err != nil {
 			log.Error(err)
 			return
@@ -49,11 +49,20 @@ GiatLocalDir ==> giat@hobbymarks
 				fmt.Printf("%s==>%s\n", gdir, gro)
 			}
 		}
-		for _, gdir := range dirs {
-			if _, gro, err := DecodeGitConfig(filepath.Join(gdir, ".git/config")); err != nil {
+		frds, err := FreezedGiatRecords()
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Trace(frds)
+		for _, gdir := range gitDirs {
+			if rURL, gro, err := DecodeGitConfig(filepath.Join(gdir, ".git/config")); err != nil {
 				log.Error(err)
 			} else {
 				if len(gro) == 0 {
+					continue
+				}
+				if ok := ArrayContainsElemenet(frds, filepath.Base(gdir)+rURL); ok {
+					log.Trace("Freezed:" + filepath.Base(gdir) + rURL)
 					continue
 				}
 				_, file := filepath.Split(gdir)
@@ -97,7 +106,7 @@ func init() {
 	unifyCmd.Flags().BoolP("inplace", "i", false, "Unify git direcotry name inplace")
 }
 
-// return remoteURL,giatDirName,err
+// return remoteURL,gitRepoName,err
 func DecodeGitConfig(configPath string) (string, string, error) {
 	cfg, err := ini.Load(configPath)
 	if err != nil {
