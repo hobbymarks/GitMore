@@ -32,8 +32,6 @@ For example:
 `,
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
@@ -66,20 +64,20 @@ func init() {
 }
 
 func FreezeGitDir(dirPath string) error {
-	if data, err := os.ReadFile(GiatRecordPath); err != nil {
+	fp := filepath.Join(dirPath, ".git", "config")
+	if rURL, _, err := DecodeGitConfig(fp); err != nil {
 		log.Error(err)
 		return err
 	} else {
-		giatrds := pb.GiatRecords{}
-		if err := proto.Unmarshal(data, &giatrds); err != nil {
-			log.Error(err)
-			return err
-		}
-		fp := filepath.Join(dirPath, ".git", "config")
-		if rURL, _, err := DecodeGitConfig(fp); err != nil {
+		if data, err := os.ReadFile(GiatRecordPath); err != nil {
 			log.Error(err)
 			return err
 		} else {
+			giatrds := pb.GiatRecords{}
+			if err := proto.Unmarshal(data, &giatrds); err != nil {
+				log.Error(err)
+				return err
+			}
 			b := filepath.Base(dirPath)
 			giatrds.FRecords = append(giatrds.FRecords, &pb.FreezedRecord{
 				BaseName:    b,
@@ -144,6 +142,18 @@ func AddGitRecord(dirName string, giatRepoName string, remoteURL string) error {
 
 	}
 	return nil
+}
+
+func IsGitDir(dirPath string) (bool, error) {
+	gpath := filepath.Join(dirPath, ".git")
+	if _, err := os.Stat(gpath); err != nil {
+		if os.IsNotExist(err) {
+			return false, nil
+		} else {
+			return false, err
+		}
+	}
+	return true, nil
 }
 
 func ArrayContainsElemenet[T comparable](s []T, e T) bool {

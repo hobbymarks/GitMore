@@ -117,15 +117,3 @@ func Dirs(rootPath string) ([]string, error) {
 
 	return dirs, nil
 }
-
-func IsGitDir(dirPath string) (bool, error) {
-	gpath := filepath.Join(dirPath, ".git")
-	if _, err := os.Stat(gpath); err != nil {
-		if os.IsNotExist(err) {
-			return false, nil
-		} else {
-			return false, err
-		}
-	}
-	return true, nil
-}

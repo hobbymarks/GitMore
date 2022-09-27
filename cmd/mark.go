@@ -21,12 +21,8 @@ var markCmd = &cobra.Command{
 			return
 		}
 		for _, arg := range args {
-			if ok, err := IsGitDir(arg); err != nil {
+			if err := FreezeGitDir(arg); err != nil {
 				log.Error(err)
-			} else if ok {
-				if err := FreezeGitDir(arg); err != nil {
-					log.Error(err)
-				}
 			}
 		}
 	},
