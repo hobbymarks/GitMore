@@ -5,12 +5,12 @@ package main
 
 import (
 	"github.com/hobbymarks/giat/cmd"
-	// log "github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {
 	// log.SetLevel(log.TraceLevel)
-	// log.SetReportCaller(true)
+	log.SetReportCaller(true)
 	cmd.Execute()
 }
 

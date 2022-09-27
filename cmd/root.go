@@ -11,6 +11,7 @@ import (
 	"github.com/hobbymarks/giat/pb"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"google.golang.org/protobuf/encoding/prototext"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -83,6 +84,51 @@ func FreezeGitDir(dirPath string) error {
 				BaseName:    b,
 				RemoteURL:   rURL,
 				LastUpdated: timestamppb.Now()})
+			if data, err := proto.Marshal(&giatrds); err != nil {
+				log.Error(err)
+				return err
+			} else {
+				if err := os.WriteFile(GiatRecordPath, data, 0644); err != nil {
+					log.Error(err)
+					return err
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func UnfreezeGitDir(dirPath string) error {
+	fp := filepath.Join(dirPath, ".git", "config")
+	if rURL, _, err := DecodeGitConfig(fp); err != nil {
+		log.Error(err)
+		return err
+	} else {
+		if data, err := os.ReadFile(GiatRecordPath); err != nil {
+			log.Error(err)
+			return err
+		} else {
+			giatrds := pb.GiatRecords{}
+			if err := proto.Unmarshal(data, &giatrds); err != nil {
+				log.Error(err)
+				return err
+			}
+			log.Trace(prototext.Format(&giatrds))
+			b := filepath.Base(dirPath)
+			nGFRDs := []*pb.FreezedRecord{}
+			for _, gfrd := range giatrds.FRecords {
+				if gfrd.BaseName == b && gfrd.RemoteURL == rURL {
+					log.Info(gfrd)
+					continue
+				} else {
+					nGFRDs = append(nGFRDs, &pb.FreezedRecord{
+						BaseName:    gfrd.BaseName,
+						RemoteURL:   gfrd.RemoteURL,
+						LastUpdated: gfrd.LastUpdated})
+				}
+			}
+			giatrds.FRecords = nGFRDs
+			log.Trace(prototext.Format(&giatrds))
 			if data, err := proto.Marshal(&giatrds); err != nil {
 				log.Error(err)
 				return err
