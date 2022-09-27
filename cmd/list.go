@@ -8,6 +8,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"sort"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -64,6 +65,9 @@ func AllGitDirs(rootPaths []string) ([]string, error) {
 	}
 	//TODO:support colorfull output
 	//TODO:supoort output grouped,such as by directory or by arg ...
+	sort.Slice(results, func(i, j int) bool {
+		return results[i] > results[j]
+	})
 	return results, nil
 }
 
